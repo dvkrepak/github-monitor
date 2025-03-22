@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import Repository, Event, EventType
 
 
@@ -13,11 +14,11 @@ class RepositoryAdmin(admin.ModelAdmin):
     list_filter = ("active",)
     search_fields = ("name", "gh_repo_id")
     ordering = ("name",)
-    readonly_fields = ("gh_repo_id",)
+    readonly_fields = ("gh_repo_id", "slug")
 
     def save_model(self, request, obj, form, change):
         """
-        Auto-fill gh_repo_id using GitHub API based on 'name' if not set manually.
+        Autofill gh_repo_id using GitHub API based on 'name' if not set manually.
         """
         if not obj.gh_repo_id:
             import requests
