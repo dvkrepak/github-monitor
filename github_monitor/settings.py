@@ -88,6 +88,8 @@ DATABASES = {
         'PORT': os.getenv("DB_PORT"),
     }
 }
+# GitHub API Token
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

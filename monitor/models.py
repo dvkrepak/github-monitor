@@ -1,17 +1,26 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
+
 class Repository(models.Model):
     """
-    GitHub repository being monitored.
+    Represents a GitHub repository being monitored.
+
+    Fields:
+    - name: Full repository name, e.g. "owner/repo"
+    - gh_repo_id: GitHub's internal numeric ID
+    - active: Whether the repository is currently monitored
     """
     name = models.CharField(max_length=255, unique=True)  # e.g. "octocat/Hello-World"
     gh_repo_id = models.BigIntegerField(unique=True)
     active = models.BooleanField(default=True)
 
     def clean(self):
-        # The application can monitor up to five configurable repositories.
-        if not self.pk:  # Instance creation
+        """
+        Enforce a maximum of 5 active repositories.
+        This is validated on both creation and activation.
+        """
+        if not self.pk:  # New instance
             if self.active and Repository.objects.filter(active=True).count() >= 5:
                 raise ValidationError("Only up to 5 active repositories are allowed.")
         else:  # Instance update
@@ -30,7 +39,8 @@ class Repository(models.Model):
 
 class EventType(models.Model):
     """
-    Distinct GitHub event types (e.g. PushEvent, PullRequestEvent).
+    Represents a distinct GitHub event type.
+    Example values: "PushEvent", "PullRequestEvent"
     """
     event_type = models.CharField(max_length=50, unique=True)
 
@@ -44,8 +54,12 @@ class EventType(models.Model):
 
 class Event(models.Model):
     """
-    GitHub Event instance, linked to repository and type.
-    Stores GitHub's original timestamp (not time of saving).
+    Represents a GitHub event for a specific repository and event type.
+
+    Fields:
+    - event_type: FK to EventType
+    - repo: FK to Repository
+    - created_at: Original event timestamp from GitHub
     """
     event_type = models.ForeignKey(EventType, on_delete=models.PROTECT)
     repo = models.ForeignKey(Repository, on_delete=models.PROTECT)
