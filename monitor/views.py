@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
@@ -29,9 +30,8 @@ class StatsAPIView(APIView):
     @staticmethod
     def get(request):
         try:
-            # Parse optional query params
-            days = int(request.GET.get("days", 7))
-            limit = int(request.GET.get("limit", 500))
+            days = int(request.GET.get("days", settings.EVENT_DAYS_LIMIT))
+            limit = int(request.GET.get("limit", settings.EVENT_FETCH_LIMIT))
         except ValueError:
             return Response(
                 {"error": "Parameters 'days' and 'limit' must be integers."},
@@ -60,8 +60,8 @@ class RepoStatsAPIView(APIView):
     @staticmethod
     def get(request, slug):
         try:
-            days = int(request.GET.get("days", 7))
-            limit = int(request.GET.get("limit", 500))
+            days = int(request.GET.get("days", settings.EVENT_DAYS_LIMIT))
+            limit = int(request.GET.get("limit", settings.EVENT_FETCH_LIMIT))
         except ValueError:
             return Response(
                 {"error": "Parameters 'days' and 'limit' must be integers."},

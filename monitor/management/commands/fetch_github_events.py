@@ -19,8 +19,8 @@ class Command(BaseCommand):
     def __init__(self):
         super().__init__()
         self.page_limit = 10
-        self.min_date = now() - timedelta(days=int(getattr(settings, "EVENT_FETCH_DAYS", 7)))
-        self.event_limit = int(getattr(settings, "EVENT_FETCH_LIMIT", 500))
+        self.min_date = now() - timedelta(days=settings.EVENT_DAYS_LIMIT)
+        self.event_limit = settings.EVENT_FETCH_LIMIT
 
     def handle(self, *args, **options):
         """

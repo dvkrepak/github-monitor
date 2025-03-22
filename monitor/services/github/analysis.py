@@ -16,8 +16,8 @@ class Analyzer:
 
     def __init__(self, days=None, limit=None):
         # Use values from settings if not overridden
-        self.days = days or int(getattr(settings, "EVENT_FETCH_DAYS", 7))
-        self.limit = limit or int(getattr(settings, "EVENT_FETCH_LIMIT", 500))
+        self.days = days or settings.EVENT_DAYS_LIMIT
+        self.limit = limit or settings.EVENT_FETCH_LIMIT
         self.cutoff = now() - timedelta(days=self.days)
 
     def get_stats(self, repo: Repository = None):
