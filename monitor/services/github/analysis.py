@@ -3,7 +3,7 @@ from django.utils.timezone import now
 from datetime import timedelta
 from django.conf import settings
 
-from .models import Repository, Event, EventType
+from monitor.models import Repository, Event, EventType
 
 
 class Analyzer:
@@ -20,14 +20,16 @@ class Analyzer:
         self.limit = limit or int(getattr(settings, "EVENT_FETCH_LIMIT", 500))
         self.cutoff = now() - timedelta(days=self.days)
 
-    def get_stats(self):
+    def get_stats(self, repo: Repository = None):
         """
         Returns a list of stats: average interval (in seconds and human-readable) and event count,
         grouped by repository and event type.
         """
         results = []
 
-        for repo in Repository.objects.filter(active=True):
+        repos = [repo] if repo else Repository.objects.filter(active=True)
+
+        for repo in repos:
             event_types = EventType.objects.filter(
                 event__repo=repo,
                 event__created_at__gte=self.cutoff
@@ -49,6 +51,7 @@ class Analyzer:
 
                 results.append({
                     "repository": repo.name,
+                    "repository_slug": repo.slug,
                     "event_type": event_type.event_type,
                     "average_interval_seconds": avg_interval,
                     "human_readable_interval": self._format_duration(avg_interval),

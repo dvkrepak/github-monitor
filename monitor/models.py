@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-
+from django.utils.text import slugify
 
 class Repository(models.Model):
     """
@@ -12,8 +12,14 @@ class Repository(models.Model):
     - active: Whether the repository is currently monitored
     """
     name = models.CharField(max_length=255, unique=True)  # e.g. "octocat/Hello-World"
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
     gh_repo_id = models.BigIntegerField(unique=True)
     active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def clean(self):
         """

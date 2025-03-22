@@ -6,22 +6,6 @@ import random
 from monitor.models import Repository, EventType, Event
 
 
-def _create_random_events(repo, event_type):
-    now = timezone.now()
-    num_events = random.randint(50, 150)
-
-    for i in range(num_events):
-        delta = timedelta(minutes=random.randint(0, 60 * 24 * 7))
-        created_at = now - delta
-
-        if not Event.objects.filter(repo=repo, event_type=event_type, created_at=created_at).exists():
-            Event.objects.create(
-                repo=repo,
-                event_type=event_type,
-                created_at=created_at
-            )
-
-
 class Command(BaseCommand):
     help = "Load test repositories, event types, and events"
 
@@ -46,6 +30,22 @@ class Command(BaseCommand):
 
         for repo in Repository.objects.filter(active=True):
             for etype in EventType.objects.all():
-                _create_random_events(repo, etype)
+                self._create_random_events(repo, etype)
 
         self.stdout.write(self.style.SUCCESS("✓ Test data loaded."))
+
+    @staticmethod
+    def _create_random_events(repo, event_type):
+        now = timezone.now()
+        num_events = random.randint(50, 150)
+
+        for i in range(num_events):
+            delta = timedelta(minutes=random.randint(0, 60 * 24 * 7))
+            created_at = now - delta
+
+            if not Event.objects.filter(repo=repo, event_type=event_type, created_at=created_at).exists():
+                Event.objects.create(
+                    repo=repo,
+                    event_type=event_type,
+                    created_at=created_at
+                )
