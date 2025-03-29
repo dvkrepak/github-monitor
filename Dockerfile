@@ -14,8 +14,6 @@ COPY . .
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-# Запуск через entrypoint
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# По умолчанию запускаем сервер
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
